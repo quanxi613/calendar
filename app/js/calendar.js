@@ -8,9 +8,10 @@
     var Calendar = function (container, options) {
         var me = this; 
         me.container = $(container);  
-        me.status = {
-            year: moment().get('year'),
-            month: moment().get('month')
+        me.moment = moment();
+        me.current = {
+            year: me.moment.get('year'),
+            month: me.moment.get('month')
         };
         me.init();
     };
@@ -20,17 +21,8 @@
         init: function () {
             var me = this;
             me.createWrap();
-            
-            //moment.locale('en');
-            var status = {
-                year: moment().get('year'),
-                month: moment().get('month')
-            }
-            me.render(status.year, status.month);
-     
-
-            //localLocale.locale('zh-cn');    
-            //
+                      
+            me.render(me.moment);
             
             me.goPrevMon();
             me.goNextMon();
@@ -60,13 +52,19 @@
             $('.calendar-container').html(htmlStr);
         },
 
-        render: function (year, month) {
+        render: function (moment) {
             var me = this;
+            var year = moment.get('year');
+            var month = moment.get('month');
             $('.year-month .year').text(year);
             $('.year-month .month').text(month+1);
+            
 
-            var firstday = me.getfirstday(year, month);
-            var curMonDays = me.getdaysinonemonth(year, month);
+            var firstday = moment.startOf('month').day();
+            if(firstday == 0) {
+                firstday = 7;
+            }
+            var curMonDays = moment.daysInMonth();
             var arr = [];
 
             for(var i=0, len=firstday-1; i<len; i++) {
@@ -74,11 +72,11 @@
             }
 
             for(var i=1, len=curMonDays+1; i<len; i++) {
-                if(i == moment().date()) {
-                    arr.push('<li class="current-day">'+i+'</li>');
+                if(i == moment.date() && year == me.current.year && month == me.current.month) {
+                    arr.push('<li class="day current-day">'+i+'</li>');
                 }
                 else {
-                    arr.push('<li>'+i+'</li>');
+                    arr.push('<li class="day">'+i+'</li>');
                 }
             }
 
@@ -87,18 +85,9 @@
 
         goNextMon: function () {
             var me = this;
-            var year, month;
 
             me.container.on('click', '.btn-next', function () {
-
-                if(me.status.month < 11) {
-                    me.render(me.status.year, ++me.status.month);
-                }
-                else {
-                    me.status.year =  me.status.year + 1;
-                    me.status.month = 1;
-                    me.render(me.status.year, me.status.month++);
-                }
+                me.render(me.moment.add(1, 'month'));
             });
         },
 
@@ -106,29 +95,8 @@
             var me = this;
 
             me.container.on('click', '.btn-prev', function () {
-                var year, month;
-                if(me.status.month > 0) {
-                    me.render(me.status.year, --me.status.month);
-                }
-                else {
-                    me.status.year =  me.status.year - 1;
-                    me.status.month = 11;
-                    me.render(me.status.year, me.status.month--);
-                }
+                me.render(me.moment.subtract(1, 'month'));
             });
-        },
-
-        //算某个月的第一天是星期几
-        getfirstday: function (year, month) { 
-            var d = new Date(year, month, 1);
-            return d.getDay() == 0 ? 7 : d.getDay();
-        },
-
-        //算某个月的总天数
-        getdaysinonemonth: function (year, month) {     
-            month = parseInt(month, 10);
-            var d = new Date(year, month, 0);
-            return d.getDate();
         }
     };
 
