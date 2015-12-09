@@ -1,0 +1,96 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+ul, li {
+    list-style: none;
+}
+a {
+    text-decoration: none;
+}
+
+.clearfix:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+.clearfix{*+height:1%;}
+
+h2 {
+    font-size: 22px;
+    line-height: 20px;
+    margin: 4px 0;
+}
+
+.calendar-container {
+    width: 510px;
+	margin:40px auto 0 auto;
+}
+
+.calendar {
+    text-align: center;
+}
+
+.calendar header {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.btn-prev,
+.btn-next {
+    border: 2px solid #cbd1d2;
+    border-radius: 50%;
+    color: #cbd1d2;
+    height: 32px;
+    font-size: 22px;
+    line-height: 28px;
+    margin: -16px;
+    position: absolute;
+    top: 50%;
+    width: 32px;
+}
+
+.btn-prev:hover,
+.btn-next:hover {
+    background: #cbd1d2;
+    color: #f9f9f9;
+}
+
+.btn-prev {
+    left: 30px;
+}
+
+.btn-next {
+    right: 35px;
+}
+
+.week span{
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 22px;
+}
+
+.date {
+    text-align: left;
+    padding: 0px 45px;
+    margin-top: 10px;
+    clear: both;
+}
+
+.date li{
+    float: left;
+    color: #7c8a95;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    height: 60px;
+    line-height: 60px;
+    text-align: center;
+    width: 60px;
+    margin-bottom: 10px;
+    vertical-align: text-bottom;
+}
+
+.date li:hover {
+    border: 2px solid #c0392b;
+}
+
+.date li.current-day {
+    background: #c0392b;
+    color: #f9f9f9;
+}
