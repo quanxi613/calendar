@@ -16,6 +16,10 @@
 	<script src="js/zh-cn.js"></script>
 	<script src="js/calendar.js" type="text/javascript"></script>
 	<script>
-		$('.calendar-container').calendar();
+		$('.calendar-container').calendar({
+			onDateClick: function (date) {
+				console.log(date);
+			}
+		});
 	</script>
 </html>

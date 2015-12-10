@@ -74,6 +74,7 @@ h2 {
 }
 
 .date li{
+    position: relative;
     float: left;
     color: #7c8a95;
     border: 2px solid transparent;
@@ -86,11 +87,36 @@ h2 {
     vertical-align: text-bottom;
 }
 
-.date li:hover {
-    border: 2px solid #c0392b;
+.date .day:hover {
+    border: 2px solid #04a9f5;
 }
 
 .date li.current-day {
-    background: #c0392b;
+    background: #04a9f5;
     color: #f9f9f9;
+}
+
+.date li.active {
+    border: 2px solid #04a9f5;
+}
+
+.date .event {
+    cursor: pointer;
+}
+
+.date .event:after {
+    background: #04a9f5;
+    border-radius: 50%;
+    bottom: 5px;
+    display: block;
+    content: '';
+    height: 8px;
+    left: 50%;
+    margin: -4px 0 0 -4px;
+    position: absolute;
+    width: 8px;
+}
+
+.date li.current-day.event:after {
+    background: #fff;
 }

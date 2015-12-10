@@ -13,6 +13,7 @@
             year: me.moment.get('year'),
             month: me.moment.get('month')
         };
+        me.options = $.extend(true, {}, Calendar.defaults, options);
         me.init();
     };
 
@@ -26,6 +27,7 @@
             
             me.goPrevMon();
             me.goNextMon();
+            me.onDateClickHandle();
         },
 
         createWrap: function () {
@@ -56,31 +58,47 @@
             var me = this;
             var year = moment.get('year');
             var month = moment.get('month');
-            $('.year-month .year').text(year);
-            $('.year-month .month').text(month+1);
-            
 
-            var firstday = moment.startOf('month').day();
-            if(firstday == 0) {
-                firstday = 7;
-            }
-            var curMonDays = moment.daysInMonth();
-            var arr = [];
-
-            for(var i=0, len=firstday-1; i<len; i++) {
-                arr.push('<li></li>');
-            }
-
-            for(var i=1, len=curMonDays+1; i<len; i++) {
-                if(i == moment.date() && year == me.current.year && month == me.current.month) {
-                    arr.push('<li class="day current-day">'+i+'</li>');
+            me.eventDateListPromise = me.getEventDateList({
+                year: year,
+                month: month
+            });
+            me.eventDateListPromise.then(function (eventDateList) {
+                
+                $('.year-month .year').text(year);
+                $('.year-month .month').text(month+1);
+                
+                var firstday = moment.clone().startOf('month').day();
+                if(firstday == 0) {
+                    firstday = 7;
                 }
-                else {
-                    arr.push('<li class="day">'+i+'</li>');
-                }
-            }
+                var curMonDays = moment.daysInMonth();
+                var arr = [];
 
-            $('.date').html(arr.join(''));
+                for(var i=0, len=firstday-1; i<len; i++) {
+                    arr.push('<li></li>');
+                }
+
+                for(var i=1, len=curMonDays+1; i<len; i++) {
+                    if (i == moment.date() && year == me.current.year && month == me.current.month) {
+                        arr.push('<li class="day current-day" data-year="'+year
+                                +'" data-month="'+(month+1)
+                                +'" data-day="'+i+'">'+i+'</li>');
+                    }
+                    else {
+                        arr.push('<li class="day" data-year="'+year
+                                +'" data-month="'+(month+1)
+                                +'" data-day="'+i+'">'+i+'</li>');
+                    }
+                }
+
+                $('.date').html(arr.join(''));
+
+                $.each(eventDateList, function(index, val) {
+                    $('.date [data-day]').eq(val-1).addClass('event');
+                });
+                
+            });          
         },
 
         goNextMon: function () {
@@ -97,8 +115,56 @@
             me.container.on('click', '.btn-prev', function () {
                 me.render(me.moment.subtract(1, 'month'));
             });
+        },
+
+        onDateClickHandle: function () {
+            var me = this;
+
+            me.container.on('click', '[data-day]', function () {
+                var _this = $(this);
+                var date = {
+                    year: _this.data('year'),
+                    month: _this.data('month'),
+                    day: _this.data('day')
+                };
+
+                me.date = date;
+                if(_this.hasClass('event')) {
+                    _this.addClass('active');
+                    _this.siblings('.event').removeClass('active');
+                }
+                me.options.onDateClick(date);
+            });
+        },
+
+        /**
+        * 如果设置了eventDateListAPI则从该url获取城市列表, 设置dataType为jsonp可跨域
+        * 如果没设置, 则使用eventDateList, 返回Promise保证调用正常
+        * @return {Promise} 返回默认event的Promise对象
+        **/
+        getEventDateList: function (yearMonth) {
+            var me = this;
+            if (me.options.eventDateListAPI) {
+                return $.ajax({
+                    url: me.options.eventDateListAPI,
+                    dataType:　me.options.dataType,
+                    data: yearMonth
+                })
+            } 
+            else {
+                var dfd = $.Deferred();
+                dfd.resolve(me.options.eventDateList);
+                return dfd.promise();
+            }
         }
     };
+
+    Calendar.defaults = {
+        eventDateListAPI: '',
+        dataType: 'json',
+        eventDateList: [1,2,10],
+        onDateClick: $.noop
+    }
 
     // plugin definition
     // 在元素上绑定组件对象
